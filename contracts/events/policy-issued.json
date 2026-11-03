@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolicyIssued",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "event_type", "occurred_at", "policy_id"],
+  "properties": {
+    "event_id": {"type": "string", "format": "uuid"},
+    "event_type": {"const": "policy.issued"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "policy_id": {"type": "string", "minLength": 1}
+  }
+}

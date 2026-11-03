@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: Shield Policy Service
+  version: 0.1.0
+  description: Synthetic callable fixture; no HTTP adapter is deployed.
+paths:
+  /policies:
+    post:
+      operationId: issue_policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [policy_id, customer_id, applicant_age, coverage_cents, deductible_cents]
+              properties:
+                policy_id: {type: string, minLength: 1}
+                customer_id: {type: string, minLength: 1}
+                applicant_age: {type: integer, minimum: 0, maximum: 120}
+                coverage_cents: {type: integer, minimum: 1}
+                deductible_cents: {type: integer, minimum: 0}
+      responses:
+        "201":
+          description: Policy issued and event prepared for publication.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [policy, event]
+                properties:
+                  policy: {$ref: "#/components/schemas/Policy"}
+                  event: {$ref: "./events/policy-issued.json"}
+        "400":
+          description: Invalid input, including a deductible greater than coverage.
+        "409":
+          description: Ineligible applicant or duplicate policy ID.
+  /policies/{policy_id}:
+    get:
+      operationId: get_policy
+      parameters:
+        - name: policy_id
+          in: path
+          required: true
+          schema: {type: string, minLength: 1}
+      responses:
+        "200":
+          description: Policy coverage, deductible, and annual premium in USD cents.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Policy"}
+        "404":
+          description: Policy not found.
+components:
+  schemas:
+    Policy:
+      type: object
+      required: [policy_id, customer_id, coverage_cents, deductible_cents, premium_cents, status]
+      properties:
+        policy_id: {type: string, minLength: 1}
+        customer_id: {type: string, minLength: 1}
+        coverage_cents: {type: integer, minimum: 1}
+        deductible_cents: {type: integer, minimum: 0}
+        premium_cents: {type: integer, minimum: 1}
+        status: {type: string, enum: [active, cancelled]}
