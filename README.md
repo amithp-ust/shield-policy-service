@@ -26,10 +26,17 @@ Coordinate view changes with Claims platform and the fraud consumer link in
 `shield-fraud-scoring/contracts/policy-risk-view.json`.
 Run the sibling `shield-context/scripts/verify_fixture.py --repos-root ..`
 from the context checkout to check the real migration against the shared schema.
-Full intent packages belong in the primary owning app repo; secondary repos
-contain linked component slices, never duplicate full specifications.
+## Specification consumer
 
-Shared context: `amithp-ust/shield-context` (`AGENTS.md`, glossary, scope,
-standards, and component map). `specs/` is empty pending spec pull requests.
-Python 3.12+, standard library only. Run `python -m unittest discover -s tests`.
+Canonical specs, authoring, gates, and requirement metrics live only in
+[`amithp-ust/Intent-to-spec`](https://github.com/amithp-ust/Intent-to-spec).
+Shared glossary, map, standards, and policy remain in
+[`amithp-ust/shield-context`](https://github.com/amithp-ust/shield-context).
+This repo owns `CM-POLICY` implementation, not spec authoring. See
+[AGENTS.md](AGENTS.md) for immutable approved spec references, issue/PR traceability,
+human review, and fixture-contract checks. Do not install authoring here or copy
+specs; empty `specs/.gitkeep` is a legacy placeholder.
+
+Python 3.11+, standard library only. Run `python -m unittest discover -s tests`
+from this repository root; the unit-test CI runs the same command on Python 3.11.
 These are local callable stubs, not deployed HTTP services.
