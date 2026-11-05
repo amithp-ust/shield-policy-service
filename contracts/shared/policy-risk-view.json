@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/amithp-ust/shield-policy-service/main/contracts/shared/policy-risk-view.json",
+  "title": "policy_risk_view row",
+  "description": "Existing SQLite read contract owned by CM-POLICY (Policy platform), consumed by CM-FRAUD (Claims platform) through its injected policy_database connection. Evidence: db/migrations/001_policy.sql and shield-fraud-scoring/src/fraud/scoring.py. This documents the fixture, not an approved production database-access policy.",
+  "type": "object",
+  "required": ["policy_id", "coverage_cents", "deductible_cents", "status"],
+  "properties": {
+    "policy_id": {"type": ["string", "null"]},
+    "coverage_cents": {"type": "integer", "minimum": 1},
+    "deductible_cents": {"type": "integer", "minimum": 0},
+    "status": {"enum": ["active", "cancelled"]}
+  },
+  "additionalProperties": false,
+  "x-view": "policy_risk_view",
+  "x-provider": "CM-POLICY",
+  "x-consumers": ["CM-FRAUD"],
+  "x-access": "SELECT only; provider migration creates the view",
+  "x-invariants": [
+    "deductible_cents <= coverage_cents",
+    "Non-null policy_id values are unique; SQLite TEXT PRIMARY KEY permits NULL in this existing rowid table",
+    "Amounts are integer USD cents"
+  ],
+  "x-reader": {
+    "lookup": "policy_id = ?",
+    "projection": ["coverage_cents", "deductible_cents", "status"],
+    "missing_row": "LookupError",
+    "missing_view": "sqlite3.OperationalError"
+  },
+  "x-evolution": "Coordinate provider and consumer contract review before changing the view or its columns; no schema or runtime behavior is changed here."
+}
